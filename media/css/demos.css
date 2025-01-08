@@ -1,0 +1,90 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * General page setup - just ignore this part - it's used for the demos
+ */
+body, html {
+	margin: 0;
+	padding: 0;
+	color: #333;
+	background-color: #fff;
+	height: 100%;
+	width: 100%;
+}
+
+body {
+	font: 80%/1.45em "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+}
+
+
+#alert_example #container {
+	width: 800px;
+	margin: 30px auto;
+	padding: 0;
+}
+
+#alert_example #footer {
+	margin: 50px auto 0 auto;
+	padding: 0;
+}
+
+#alert_example #demo {
+	color: blue;
+	cursor: pointer;
+	*cursor: hand;
+}
+
+#alert_example #demo:hover {
+	text-decoration: underline;
+}
+
+#alert_example .big {
+	font-size: 1.3em;
+	font-weight: bold;
+	line-height: 1.6em;
+	color: #4E6CA3;
+}
+
+#alert_example .spacer {
+	height: 20px;
+	clear: both;
+}
+
+#alert_example .clear {
+	clear: both;
+}
+
+#alert_example pre {
+	padding: 15px;
+	background-color: #F5F5F5;
+	border: 1px solid #CCCCCC;
+}
+
+#alert_example h1 {
+	margin-top: 2em;
+	font-size: 1.3em;
+	font-weight: normal;
+	line-height: 1.6em;
+	color: #4E6CA3;
+	border-bottom: 1px solid #B0BED9;
+	clear: both;
+}
+
+#alert_example h2 {
+	font-size: 1.2em;
+	font-weight: normal;
+	line-height: 1.6em;
+	color: #4E6CA3;
+	clear: both;
+}
+
+#alert_example a {
+	color: #0063DC;
+	text-decoration: none;
+}
+
+#alert_example a:hover {
+	text-decoration: underline;
+}
+
+#alert_example ul {
+	color: #B0BED9;
+}

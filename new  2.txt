@@ -1,0 +1,83 @@
+					//get and compute the price of the selected items.cockfighterprice
+						var price = 0;
+						try{
+							var cockfighter = document.getElementById("cockfighter").value;
+							if (cockfighter != ""){
+								var cockfighterprice = document.getElementById("cockfighterprice").value;
+								 price += (cockfighter * cockfighterprice) ;
+							}
+						} catch(e) {}
+						
+						try{
+							var bonedryred = document.getElementById("bonedryred").value;
+							if (bonedryred != ""){
+								var bonedryredprice = document.getElementById("bonedryredprice").value;
+								 price += (bonedryred * bonedryredprice) ;
+							}
+						} catch(e) {}
+						try{
+							var ghostlywhite = document.getElementById("ghostlywhite").value;
+							if (ghostlywhite != ""){
+								var ghostlywhiteprice = document.getElementById("ghostlywhiteprice").value;
+								 price += (ghostlywhite * ghostlywhiteprice) ;
+							}
+						} catch(e) {}
+						try{
+							var ahmnio = document.getElementById("ahmnio").value;
+							if (ahmnio != ""){
+								var ahmnioprice = document.getElementById("ahmnioprice").value;
+								 price += (ahmnio * ahmnioprice) ;
+							}
+						} catch(e) {}
+						try{
+							var ahnejos = document.getElementById("ahnejos").value;
+							if (ahnejos != ""){
+								var ahnejosprice = document.getElementById("ahnejosprice").value;
+								 price += (ahnejos * ahnejosprice) ;
+							}
+						} catch(e) {}
+						try{
+							
+							var chateau = document.getElementById("chateau").value;
+							if (chateau != ""){
+								var chateauprice = document.getElementById("chateauprice").value;
+								 price += (chateau * chateauprice) ;
+							}
+						} catch(e) {}
+						try{
+							var syrah = document.getElementById("syrah").value;
+							if (syrah != ""){
+								var syrahprice = document.getElementById("syrahprice").value;
+								 price += (syrah * syrahprice) ;
+							}
+						} catch(e) {}
+						try{
+							
+							var adele = document.getElementById("adele").value;
+							if (adele != ""){
+								var adeleprice = document.getElementById("adeleprice").value;
+								 price += (adele * adeleprice) ;
+							}
+						} catch(e) {}
+						try{
+							
+							var hlanvin = document.getElementById("hlanvin").value;
+							if (hlanvin != ""){
+								var hlavinprice = document.getElementById("hlavinprice").value;
+								 price += (hlanvin * hlavinprice) ;
+							}
+						} catch(e) {}
+						try{
+							var morton = document.getElementById("morton").value;
+							if (morton != ""){
+								var mortonprice = document.getElementById("mortonprice").value;
+								 price += (morton * mortonprice) ;
+							}
+						} catch(e) {}
+						try{
+							var launrentperrier = document.getElementById("launrentperrier").value;
+							if (launrentperrier != ""){
+								var launrentperrierprice = document.getElementById("launrentperrierprice").value;
+								 price += (launrentperrier * launrentperrierprice) ;
+							}
+						} catch(e) {}

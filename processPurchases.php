@@ -1,0 +1,464 @@
+<?php  
+SESSION_START();
+	if(isset($_POST['save'])){
+			//print("entered successfully");
+			$isError = "False";
+			$name ='';
+			$category = '';
+			$price ='';
+			
+			if(!empty($_POST['wineCategory'])){
+				$category = $_POST['wineCategory'];
+			}else{
+				$isError = "True";
+			}
+			
+			if(!empty($_POST['wineName'])){
+				$name = $_POST['wineName'];
+			}else{
+				$isError = "True";
+			}
+			
+			if(!empty($_POST['winePrice'])){
+				$price = $_POST['winePrice'];
+			}else{
+				$isError = "True";
+			}
+			if($isError == "False"){
+				if(!empty($_FILES['uploadfile'])){
+					require_once'connection.php';
+					
+					//change this path to match your images directory
+					$dir ="C:/wamp/www/Hotel/Images";
+					//make sure the uploaded file transfer was successful
+					if ($_FILES['uploadfile']['error'] != UPLOAD_ERR_OK) {
+					
+						switch ($_FILES['uploadfile']['error']) {
+							case UPLOAD_ERR_INI_SIZE:
+								$passportError = 'The uploaded file exceeds the upload_max_filesize directive in php.ini.';
+								die();
+								break;
+							case UPLOAD_ERR_FORM_SIZE:
+								$passportError = 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.';
+								die();
+								break;
+							
+							case UPLOAD_ERR_PARTIAL:
+								$passportError = 'The uploaded file was only partially uploaded.';
+								die();
+								
+								break;
+							case UPLOAD_ERR_NO_FILE:
+								$passportError = 'No file was uploaded.';
+								die();
+								break;
+							case UPLOAD_ERR_NO_TMP_DIR:
+								$passportError ='The server is missing a temporary folder.';
+								die();
+								break;
+							case UPLOAD_ERR_CANT_WRITE:
+								$passportError = 'The server failed to write the uploaded file to disk.';
+								die();
+								break;
+							case UPLOAD_ERR_EXTENSION:
+								$passportError = 'File upload stopped by extension.';
+								die();
+								break;
+						}
+					}
+					//get info about the image being uploaded
+					//$password = $_POST['password'];
+					//$userName = $_POST['username'];
+					$imageDate = date('Y-m-d');
+					list($width, $height, $type, $attr) = getimagesize($_FILES['uploadfile']['tmp_name']);
+					// make sure the uploaded file is really a supported image
+					switch ($type) {
+						case IMAGETYPE_GIF:
+							try{
+								$image = imagecreatefromgif($_FILES['uploadfile']['tmp_name']);
+								$ext = '.gif';
+							}catch(Exception $e) {
+								//echo $e->getMessage();
+								//echo 'Sorry, could not upload file';
+								$passportError = 'The file you uploaded was not a supported filetype.';
+								die();
+							}
+							break;
+						case IMAGETYPE_JPEG:
+							try{
+								$image = imagecreatefromjpeg($_FILES['uploadfile']['tmp_name']);
+								//print($image);
+								$ext = '.jpg';
+							}catch(Exception $e) {
+								//echo $e->getMessage();
+								//echo 'Sorry, could not upload file';
+								$passportError = 'The file you uploaded was not a supported filetype.';
+								die();
+							}
+							break;
+						case IMAGETYPE_PNG:
+							try{
+								$image = imagecreatefrompng($_FILES['uploadfile']['tmp_name']);
+								$ext = '.png';
+							}catch(Exception $e) {
+								//echo $e->getMessage();
+								//echo 'Sorry, could not upload file';
+								$passportError = 'The file you uploaded was not a supported filetype.';
+								die();
+							}
+							break;
+						default:
+							$passportError = 'The file you uploaded was not a supported filetype.';
+							die();
+					}
+					//insert information into image table
+					$query = "INSERT INTO tblWines (wineCategory, wineName, winePrice) VALUES ('" . $category. "','" . $name . "','" . $price ."')";
+					$result = mysql_query($query, $db) or die (mysql_error($db));
+					//print("inserted successfully");
+					//retrieve the image_id that MySQL generated automatically when we inserted
+					//the new record
+					$last_id = mysql_insert_id();
+					//because the id is unique, we can use it as the image name as well to make
+					//sure we don't overwrite another image that already exists
+					$imagename = $last_id . $ext;
+					// update the image table now that the final filename is known.
+					$query = "UPDATE tblWines SET winePicture = '" . $imagename . "'	WHERE wineID = " . $last_id;
+					$result = mysql_query($query, $db) or die (mysql_error($db));
+					//print("updated successfully");
+					//save the image to its final destination
+					switch ($type) {
+						case IMAGETYPE_GIF:
+							imagegif($image, $dir . '/' . $imagename);
+							break;
+						case IMAGETYPE_JPEG:
+							imagejpeg($image, $dir . '/' . $imagename, 100);
+							break;
+						case IMAGETYPE_PNG:
+							imagepng($image, $dir . '/' . $imagename);
+							break;
+					}
+					
+					imagedestroy($image);
+					$passportError = "Added Successfully!!!";
+					//header("location:newWine.php");
+				}else{
+					$passportError ="Select/Browse Passport First!!!";
+					//header("location:uploadPassport.php");
+				}
+			}//end if($isError == "False")
+	} 
+?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+   <title>Hotel 7teen Home</title> 
+	 <link href="themes/4/js-image-slider.css" rel="stylesheet" type="text/css" />
+    <script src="themes/4/js-image-slider.js" type="text/javascript"></script>
+    <link href="generic.css" rel="stylesheet" type="text/css" />
+
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		
+
+	<!--!<link rel="stylesheet" type="text/css" href="media/css/demos.css" />-->
+	<link rel="stylesheet" type="text/css" href="media/css/alert.css" />
+
+	<script type="text/javascript" src="media/js/js-core.js"></script>
+	<script type="text/javascript" src="media/js/alert.js"></script>
+<script type="text/javascript">
+			
+			window.onload = function() { 
+				
+				/*
+				document.getElementById("passport").innerHTML = ['<img height="150px" width="200px" class="thumb" src="', 'Images/wine.jpg',
+								'" title="', escape("Images/wine.jpg"), '"/>'].join('');
+			
+				 * You'll probably want to replace this with $('#demo').click( fn ); or whatever the
+				 * JS library you are using uses. If none then this will do nicly!
+				 */
+				jsCore.addListener( {
+					"mElement":  "demo",
+					"sType":     "click",
+					'sTitle': 'Hotel 7teen',
+					"fnCallback": function() {
+						
+						Alert.fnConfirm("<img height=\'80\' width=\'400\' src=\'images/wines_top_photo.jpg\' /><br /><font color=\'black\' name=\'Arial\' size=\'4\'><b>Please, You\'ll Need To Provide The Category Name!!!</b></font>",
+							fnCallbackOkay, fnCallbackCancel );
+					}
+				} );
+				
+				fnCallbackOkay = function () {
+					//Alert.fnAlert( "The okay button was selected." );
+					Alert.fnCustom({
+								//var enableSubmit = false;
+								'sTitle': 'Hotel 7teen - New Wine Category!!!',
+								'sMessage': '<img height=\'80\' width=\'400\' src=\'images/wines_top_photo.jpg\' /> \
+									<center> \
+										<table><tr><td align="right"><b>Category Name :</b></td><td align="left"><input type="text" name="category" id="category" /></select></td></tr> \
+										</table><p /> \
+									</center>',
+								'sDisplay': 'abcd',
+								'fnPreComplete': function() {
+									if((document.getElementById('category').value == '') ) {
+										document.getElementById('alert_header').innerHTML = 'Hotel 7teen - New Category!!!';
+										return false;
+									}
+									return true;
+								},
+								'aoButtons': [
+									{
+										'sLabel': 'Submit',
+										'sClass': 'selected',
+										'cPosition': 'd',
+										'fnSelect': function() {
+											
+											var categoryName = document.getElementById('category').value;
+											
+											if(window.XMLHttpRequest)
+											{
+												
+												//code for internet explorer 7 and above, Firefox, safari, opera, and Chrome
+												xmlhttp =new XMLHttpRequest();
+											}else
+											{
+												//code for intenet explorer 6 and bellow
+												xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+											}
+											xmlhttp.onreadystatechange = function()
+											{
+												
+												if((xmlhttp.readyState == 4) && (xmlhttp.status == 200))
+												{
+													//alert(xmlhttp.responseText);
+													document.forms['addNewWine'].submit();
+												}
+											}
+											//alert(routine);
+											xmlhttp.open("GET", "addNewWineCategory.php?categoryName="+categoryName,true);
+											xmlhttp.send();
+										}
+									},
+									{
+										
+										'sLabel': 'Cancel',
+										'sClass': 'selected',
+										'cPosition': 'c',
+										
+									}
+									
+								]
+							} );
+				}
+	
+				fnCallbackCancel = function () {
+					Alert.fnCustom({'sTitle': 'Hotel 7teen','sMessage': 'Thank You For Using This System.','sDisplay': 'aaab','aoButtons': 
+						[
+							{
+								'sLabel': 'Okay',
+								'sClass': 'selected',
+								'cPosition': 'd'
+							
+							}
+						]});
+				}
+			}
+
+		
+		</script>
+	
+
+</head>
+ 
+<body style="background-color: #000;background-image: url(images/bg-img.png;);background-repeat: repeat-x;">
+    <div class="div1" id="prices">
+    </div>
+	<form name="addNewWine" id="addNewWine" method="post" action="addNewWine.php" enctype="multipart/form-data">
+		<table width='100%' >
+			<tr>
+				<td align='center' width='20%'>
+				
+				</td>
+			</tr>
+			<tr>
+			
+				<td align='center' width='60%'>
+					
+					<table style ="border-style: double; border-color: #FFCC00; border-width: 4;">
+						<tr>
+							<td rowspan="3" width="100px" style ="border-style: double; border-color: #330066; border-width: 4;">
+								<img src="images/logo-img.jpg" alt="LOGO IMAGE" />
+							</td>
+						</tr>
+						<tr>
+							<td align="right">
+								<img src="images/hotline-img.jpg" alt="LOGO IMAGE" />
+							</td>
+						</tr>
+						
+						<tr>
+							<td>
+								<table >
+								 <tbody><tr class="navtxt">
+										<td width='60'><a href="http://hotel7teen.com/index.html">Home</a></td>
+										<td width='70' align="center"><a href="http://hotel7teen.com/about-us.html">About us</a></td>
+										<td width='80' align="center"><a href="http://hotel7teen.com/services.html">Services</a></td>
+										<td width='80' align="center"><a href="http://hotel7teen.com/gallery.html">Gallery</a></td>
+										<td width='90' align="center"><a href="http://hotel7teen.com/reservation.html">Reservation</a></td>
+							
+										<td width='90' align="center"><a href="http://hotel7teen.com/contact-us.php">Contact us</a></td>
+									  </tr>
+									</tbody></table>
+							</td>
+						</tr>
+						<tr>
+							<td align="right" colspan="2">
+								<img width ='100%' src="images/seperator.png" alt="" />
+							</td>
+						</tr>
+						<tr>
+							<td align='center' colspan="2" >
+								
+								<div id="sliderFrame">
+									<div id="slider">
+										<img src="images/slider-1.jpg" alt="#htmlcaption1" /> 
+										<img src="images/slider-2.jpg" alt="#htmlcaption2" />
+										<img src="images/slider-3.jpg" alt="#htmlcaption3" />
+										<img src="images/slider-4.jpg" alt="#htmlcaption4" />
+										<img src="images/slider-5.jpg" alt="#htmlcaption1" /> 
+										<img src="images/slider-6.jpg" alt="#htmlcaption2" />
+										<img src="images/slider-7.jpg" alt="#htmlcaption3" />
+										<img src="images/slider-8.jpg" alt="#htmlcaption4" />
+										<img src="images/slider-9.jpg" alt="#htmlcaption4" />
+									</div>
+									<!--Custom navigation buttons on both sides-->
+									<div class="group1-Wrapper">
+										<a onClick="imageSlider.previous()" class="group1-Prev"></a>
+										<a onClick="imageSlider.next()" class="group1-Next"></a>
+									</div>
+									<!--thumbnails-->
+									<div id="thumbs">
+										<!-- navigation buttons in the thumbnails bar -->
+										<a onClick="imageSlider.previous()" class="group2-Prev"></a>
+										<a id='auto' onClick="switchAutoAdvance()"></a>
+										<a onClick="imageSlider.next()" class="group2-Next" style="margin-right:30px;"></a>
+										<!--Each thumb
+										<div class="thumb"><img src="images/thumb-1.gif" /></div>
+										<div class="thumb"><img src="images/thumb-2.gif" /></div>
+										<div class="thumb"><img src="images/thumb-3.gif" /></div>
+										<div class="thumb"><img src="images/thumb-4.gif" /></div>
+										<div class="thumb"><img src="images/thumb-5.gif" /></div>
+										<div class="thumb"><img src="images/thumb-6.gif" /></div>
+										<div class="thumb"><img src="images/thumb-7.gif" /></div>
+										<div class="thumb"><img src="images/thumb-8.gif" /></div>
+										<div class="thumb"><img src="images/thumb-9.gif" /></div>
+										-->
+									</div>
+									<div id="htmlcaption1" style="display: none;">
+										<div style="width:190px;height:200px;display:inline-block;background:transparent url(images/caption1.jpg) no-repeat 0 0;border-radius:4px;"></div>
+									</div>
+									<div id="htmlcaption2" style="display: none;">
+										<div style="width:190px;height:100px;display:inline-block;background:transparent url(images/caption2.jpg) no-repeat 0 0;border-radius:4px;"></div>
+									</div>
+									<div id="htmlcaption3" style="display: none;">
+										<div style="width:190px;height:200px;display:inline-block;background:transparent url(images/caption3.jpg) no-repeat 0 0;border-radius:4px;"></div>
+									</div>
+									<div id="htmlcaption4" style="display: none;">
+										<div style="width:190px;height:200px;display:inline-block;background:transparent url(images/caption4.jpg) no-repeat 0 0;border-radius:4px;"></div>
+									</div>
+								</div>
+							</td>
+						</tr>
+						<tr>
+						
+							<td>
+							
+							</td>
+						</tr>
+				 
+					</table>
+					
+				</td>
+			</tr>
+			<tr>
+				<td align="justify" >
+					<table align='center' border='2' bgcolor="#CCCCCC"> <!-- body table-->
+						<tr>
+							<td colspan='3' align='center'>
+								<font color="yellow" name="Arial" size="8"><b>Process Purchases and Delivery</b></font>
+								
+							</td>
+							
+
+						</tr>
+						
+						<tr>
+							<td id='purchaseNotification'>
+							
+							
+							</td>
+						</tr>
+						<tr>
+							<td  align="right" width='300' ><!-- body table First Column-->
+									<font color="black" name="Arial" size="4" ><b></b></font>
+								</td>
+								<td>
+								<button type='submit'  width='6000' id="cancel" name = 'cancel' height='5000' > <img src="Images/cancel.png" alt ="CANCEL" /></button>
+								<button type='submit'  width='6000' id="save" name = 'save' height='5000' > <img src="Images/save.png" alt ="SAVE" /></button>
+									
+								</td>
+								<td>
+									<!-- institution error-->
+								</td>
+							
+						</tr>
+						<tr>
+							<td colspan='3' align='center' id="alert_example" >
+								<img  id='demo' onclick="Alert.fnConfirm( {'You\'ll Required To Provide Your Credit/Master - Card Details. <br />Do You Wish To Continue? <p /><img height=\'50\' width=\'400\' src=\'images/cardimg.gif\' />',fnCallbackOkay, fnCallbackCancel} );" style ="cursor:hand;padding: 3px;border: 1px solid;" src='images/addNewCategory.png' />
+									<!--
+								<button id='demo' onclick="Alert.fnConfirm( {'You\'ll Required To Provide Your Credit/Master - Card Details. <br />Do You Wish To Continue? <p /><img height=\'50\' width=\'400\' src=\'images/cardimg.gif\' />',fnCallbackOkay, fnCallbackCancel} );" ><b>Click To Add New Wine Category</b></button>
+								-->
+							</td>
+							
+
+						</tr>
+					</table>
+				</td>
+			
+			
+				
+			</tr>
+		</table>
+					
+		
+	<table>
+		<tr>
+			<td align='center' width='20%'>
+			
+			</td>
+		</tr>
+		 <tr>
+			<td class="footer-txt" align="center" height="50"><font color="#FFCC00" name="Arial" size="3"><b>Copyright (c) 2012 Hotel Seveteen Limited. All rights reserved.<br>
+			  No. 6 Tafawa Balewa/Lafiya Road Kaduna. <strong>Tel.:</strong> 234 (0) 62-835 310, (0) 62 835 311, 08033110870<br>
+		
+			<strong>Web Address:</strong> www.hotel7teen.com, info@hotel7teen.com</b></font></td>
+		</tr>
+
+	</table>
+		<script type="text/javascript">
+			//The following script is for the group 2 navigation buttons.
+			function switchAutoAdvance() {
+				imageSlider.switchAuto();
+				switchPlayPauseClass();
+			}
+			function switchPlayPauseClass() {
+				var auto = document.getElementById('auto');
+				var isAutoPlay = imageSlider.getAuto();
+				auto.className = isAutoPlay ? "group2-Pause" : "group2-Play";
+				auto.title = isAutoPlay ? "Pause" : "Play";
+			}
+			switchPlayPauseClass();
+		</script>
+	</form>
+	
+</body>
+</html>
+
